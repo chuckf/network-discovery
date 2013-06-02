@@ -10,6 +10,7 @@
 
 
 import os
+import re
 import optparse
 import netaddr
 
@@ -19,23 +20,27 @@ parser = optparse.OptionParser()
 
 parser.add_option("--timeout","-t", help="define the timeout value",type=int)
 parser.add_option("--range","-r", help="define the IP range", nargs=1)
-parser.add_option("--cidr","-c", help="define the network in CIDR notation")
+parser.add_option("--cidr","-c", help="define the network in CIDR notation",nargs=1)
 
 (opts, args) = parser.parse_args()
 
 if not opts.range and not opts.cidr:
    print "You need to provide either the range or CIDR notation."
    exit(1)
+elif opts.cidr:
+   iprange = IPNetwork(opts.cidr)
 elif opts.range:
    ips = opts.range.split("-")
    iprange = IPRange(ips[0], ips[1])
-   #print ips[0]
-   #print ips[1]
 
 if opts.timeout is not None:
    timeout = opts.timeout
    print timeout
 
 for ip in iprange:
-   os.system("ping -c 1 " + str(ip))
-    
+   pattern = re.compile("^\d{1,3}.\d{1,3}.\d{1,3}.0")
+   test = pattern.match(str(ip))
+   if not test:
+     #print "DEBUG IP: " + str(ip)
+     #print "DEBUG IP Range: " + str(iprange)
+     os.system("ping -q -n -c 1 " + str(ip))
