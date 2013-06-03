@@ -13,8 +13,10 @@ import os
 import re
 import optparse
 import netaddr
+import subprocess
 
 from netaddr import *
+from subprocess import Popen, PIPE, STDOUT
 
 parser = optparse.OptionParser()
 
@@ -29,18 +31,27 @@ if not opts.range and not opts.cidr:
    exit(1)
 elif opts.cidr:
    iprange = IPNetwork(opts.cidr)
+   print "DEBUG: iprange = " + str(iprange)
 elif opts.range:
    ips = opts.range.split("-")
    iprange = IPRange(ips[0], ips[1])
+   print "DEBUG: iprange = " + str(iprange)
 
 if opts.timeout is not None:
    timeout = opts.timeout
    print timeout
 
 for ip in iprange:
-   pattern = re.compile("^\d{1,3}.\d{1,3}.\d{1,3}.0")
-   test = pattern.match(str(ip))
+   netaddress = re.compile("^\d{1,3}.\d{1,3}.\d{1,3}.0")
+   test = netaddress.match(str(ip))
    if not test:
-     #print "DEBUG IP: " + str(ip)
-     #print "DEBUG IP Range: " + str(iprange)
-     os.system("ping -q -n -c 1 " + str(ip))
+     DEVNULL = open(os.devnull, 'wb')
+     response = subprocess.call(['/bin/ping', '-n', '-c', '1', str(ip)], \
+         stdin=PIPE, stdout=DEVNULL, stderr=STDOUT)
+     # If the IP Address answers, print it
+     if response == 0:
+        print ip
+     #elif response == 2:
+     #   print "no response from", ip
+     #else:
+     #   print "ping to", ip, "failed!"
