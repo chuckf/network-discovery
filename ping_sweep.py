@@ -1,5 +1,4 @@
-#!/usr/bin/python
-
+#!/usr/bin/python 
 # ping_sweep.py - ping sweep a range of IPs or network block.
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -12,12 +11,10 @@
 # -c CIDR notation
 # -t default is 500 (milliseconds?)
 #
-# 6/3/2013 - Range and CIDR work now. 
+# 6/3/2013 - Range, CIDR, and timeout work now. 
 #
 # TODO:
-# 
 # Check per OS type (Mac/Linux/Windows)
-# Get TTL working (OS dependent, need defaults)
 #
 
 
@@ -27,17 +24,15 @@ import re
 import optparse
 import netaddr
 import subprocess
-import netaddr
 
 from netaddr import *
 from subprocess import Popen, PIPE, STDOUT
 
 def main():
 
-  if "Win" in platform.system():
-     ostype = "windows"
-  elif "Darwin" or "FreeBSD" or "NetBSD" or "Linux" in platform.system():
-     ostype = "unix"
+  out = os.popen("which ping")
+  ping_cmd = out.read().strip("\n")
+     
 
   parser = optparse.OptionParser()
 
@@ -67,11 +62,9 @@ def main():
      if not test:
        DEVNULL = open(os.devnull, 'wb')
        if timeout:  
-         response = subprocess.call(['/bin/ping', '-W', str(timeout), '-c', '1', str(ip)],\
-           stdin=PIPE, stdout=DEVNULL, stderr=STDOUT)
+         response = subprocess.call([ping_cmd, '-W', str(timeout), '-c 1', str(ip)],stdout=DEVNULL,stdin=PIPE,stderr=STDOUT)
        else:
-         response = subprocess.call(['/bin/ping', '-c', '1', str(ip)], \
-           stdin=PIPE, stdout=DEVNULL, stderr=STDOUT)
+         response = subprocess.call([ping_cmd, '-c 1', str(ip)], stdout=DEVNULL,stdin=PIPE,stderr=STDOUT)
        # If the IP Address answers, print it
        if response == 0:
          print ip
