@@ -13,17 +13,25 @@
 #
 # 6/5/2013 - initial code
 #
+# 6/10/2013 - added more error checking.
+#
+# TODO:
+# Get SSL encoding working
+# Get regex parsing working 
+
 
 
 import os
 import re
 import optparse
 import netaddr
+import urllib
 import urllib2
 
 from netaddr import *
 from subprocess import Popen, PIPE, STDOUT
 from optparse import OptionParser
+from urllib2 import Request, urlopen, URLError
 
 def main():
 
@@ -47,17 +55,17 @@ def main():
     port = opts.port
   else:
     port = 80
+  
+  request = urllib2.Request(url)
+  try: 
+    urllib2.urlopen(request)
+  except URLError as e:
+    print "Nothing to parse: Error code " + str(e.code) + " " + e.reason  
+    exit(1)
 
-  response = urllib2.urlopen(url)
-  print "URL: " + url
+  response = urllib2.urlopen(request)
   html = response.read()
   print html
-  #for line in html:
-  # regex for ahref
-  #  print line.rstrip() 
-  
-  response.close()  
-
 
 if __name__ == "__main__":
     main()
