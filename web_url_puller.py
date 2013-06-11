@@ -19,7 +19,7 @@ import os
 import re
 import optparse
 import netaddr
-import socket
+import urllib2
 
 from netaddr import *
 from subprocess import Popen, PIPE, STDOUT
@@ -48,7 +48,15 @@ def main():
   else:
     port = 80
 
-# open a socket to port 80
+  response = urllib2.urlopen(url)
+  print "URL: " + url
+  html = response.read()
+  print html
+  #for line in html:
+  # regex for ahref
+  #  print line.rstrip() 
+  
+  response.close()  
 
 
 if __name__ == "__main__":
