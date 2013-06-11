@@ -66,6 +66,10 @@ def main():
   response = urllib2.urlopen(request)
   html = response.read()
   print html
+  #FIX
+  # match = re.match(r'.*<a href=".*">.*', html)
+  # if match:
+  #   print match.group(1)
 
 if __name__ == "__main__":
     main()
