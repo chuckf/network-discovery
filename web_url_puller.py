@@ -1,24 +1,18 @@
 #!/usr/bin/python 
+#
 # web_url_puller.py - pull the links out of a web page
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation; Applies version 2 of the License.
 #
-# web_url_puller.py -u ip [-s]
+# web_url_puller.py -u ip 
 # 
 # -u url
-# -s uses HTTP over SSL
 # -p port number
 #
 # 6/5/2013 - initial code
-#
 # 6/10/2013 - added more error checking.
-#
-# TODO:
-# Get SSL encoding working
-# Get regex parsing working 
-
 
 
 import os
@@ -27,6 +21,7 @@ import optparse
 import netaddr
 import urllib
 import urllib2
+import lxml.html
 
 from netaddr import *
 from subprocess import Popen, PIPE, STDOUT
@@ -39,13 +34,10 @@ def main():
 
   parser.add_option("--url","-u", help="the IP address of the URL", nargs=1)
   parser.add_option("--port","-p", help="port for the URL, defaults to port 80", nargs=1, default=80)
-  parser.add_option("-s", action="store_true", dest="ssl", help="Use SSL over HTTP")
 
   (opts, args) = parser.parse_args()
 
-  if opts.url and opts.ssl:
-    url = "https://" + str(opts.url)
-  elif opts.url and not opts.ssl:
+  if opts.url:
     url = "http://" + str(opts.url)
   else:
     print "You need to provide the URL."
@@ -63,13 +55,19 @@ def main():
     print "Nothing to parse: Error code " + str(e.code) + " " + e.reason  
     exit(1)
 
-  response = urllib2.urlopen(request)
-  html = response.read()
-  print html
-  #FIX
-  # match = re.match(r'.*<a href=".*">.*', html)
-  # if match:
-  #   print match.group(1)
+  #counter for how many links in the HTML
+  linkvalue = 0 
+
+  page = urllib2.urlopen(url)
+  html = page.read()
+  links = re.findall(r"<a.*?\s*href=\"(.*?)\".*?>(.*?)</a>", html)
+
+  for link in links:
+    print('link: ' + link[0])
+    linkvalue = linkvalue+1
+
+  if linkvalue == 0:
+    print "No links in this HTML file."
 
 if __name__ == "__main__":
     main()
