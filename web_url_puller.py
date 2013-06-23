@@ -6,13 +6,18 @@
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation; Applies version 2 of the License.
 #
-# web_url_puller.py -u ip 
+# web_url_puller.py -u ip [-s]
 # 
 # -u url
 # -p port number
+# -s 
 #
 # 6/5/2013 - initial code
 # 6/10/2013 - added more error checking.
+# 6/21/2013 - working with regex
+#
+# TODO:
+# -Add SSL support
 
 
 import os
@@ -21,7 +26,6 @@ import optparse
 import netaddr
 import urllib
 import urllib2
-import lxml.html
 
 from netaddr import *
 from subprocess import Popen, PIPE, STDOUT
